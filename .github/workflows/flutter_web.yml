@@ -3,30 +3,38 @@ name: Deploy to GitHub Pages
 on:
   push:
     branches:
-      - main
+      - main # The branch to push from
 
 jobs:
-  build-and-deploy:
+  build:
+    name: Build Flutter
     runs-on: ubuntu-latest
-    permissions:
-      contents: write
     steps:
-      - name: Checkout code
-        uses: actions/checkout@v3
-
-      - name: Set up Flutter
-        uses: subosito/flutter-action@v2
+      - uses: actions/checkout@v3
+      - uses: subosito/flutter-action@v2
         with:
-          flutter-version: '3.x' 
+          flutter-version: '3.x'
+          channel: 'stable'
 
-      - name: Install dependencies
-        run: flutter pub get
+      - run: flutter pub get
+      - run: flutter build web --release --base-href /tz/
 
-      - name: Build web
-        run: flutter build web --release --base-href /tz/
+      - name: Archive production assets
+        uses: actions/upload-pages-artifact@v2
+        with:
+          path: 'build/web'
 
+  deploy:
+    name: Deploy to Pages
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    runs-on: ubuntu-latest
+    needs: build
+    permissions:
+      pages: write
+      id-token: write
+    steps:
       - name: Deploy to GitHub Pages
-        uses: peaceiris/actions-gh-pages@v3
-        with:
-          github_token: ${{ secrets.GITHUB_TOKEN }}
-          publish_dir: ./build/web
+        id: deployment
+        uses: actions/deploy-pages@v3
