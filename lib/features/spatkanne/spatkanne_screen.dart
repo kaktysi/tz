@@ -172,8 +172,8 @@ class _SpatkanneScreenState extends State<SpatkanneScreen> {
                   children: [
                     ClipRRect(
                       borderRadius: BorderRadius.circular(20),
-                      child: Image.network(
-                        "http://mirchudes.net/uploads/posts/2015-12/1449391771_cherepoveckie-bolota.jpg",
+                      child: Image.asset(
+                        "assets/boloto.jpg",
                         height: 250,
                         fit: BoxFit.cover,
                       ),
